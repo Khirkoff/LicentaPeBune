@@ -16,16 +16,24 @@ class Agent:
 
     def __init__(self):
         Properties.n_games = 0
-        self.epsilon = 100 # randomness
-        self.gamma = 0.97 # discount rate
+        self.epsilon = 2000 # randomness
+        self.gamma = 0.98 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(2, 5, 3)
+        self.model = Linear_QNet(1, 2, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
+    def metoda(self, PT1 , Blocks0 ):
+
+        if (PT1.pos.x - Blocks0.pos.x) == 0:
+            return 0
+        if (PT1.pos.y - Blocks0.pos.y) == 0:
+            if (PT1.pos.x - Blocks0.pos.x) > 0:
+                return 2
+            return -2
+        return np.arctan((PT1.pos.x - Blocks0.pos.x) / (PT1.pos.y - Blocks0.pos.y))
     def get_state(self, game):
         state = [
-            game.PT1.pos.x,  # Position of the platform
-            game.Blocks0.pos.x  # Position of the falling block  # Velocity of the falling block
+            self.metoda(game.PT1, game.Blocks0)
         ]
         return state
 
@@ -45,17 +53,16 @@ class Agent:
 
     def get_action(self, state):
         # Epsilon-greedy strategy
-        self.epsilon = 80 * 0.99**Properties.n_games
+
         if random.randint(0, 200) < self.epsilon:
             # Explore: select a random action
-            final_move = random.randint(0, 2)
-            print("1: ",final_move)
+            final_move = random.choice([0, 1, 2])
         else:
             # Exploit: select the action with max value (greedy)
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             final_move = torch.argmax(prediction).item()
-            print("2: ",final_move)
+        self.epsilon = 80 * 0.99 ** Properties.n_games
         return final_move
 
     def train(self):
@@ -66,6 +73,7 @@ class Agent:
         game.loadgrafic()
         game.blocksgroup.add(game.Blocks0)
         game.all_sprites.add(game.PT1)
+        game.all_sprites.add(game.Blocks0)
 
         while Properties.running:
             for event in pygame.event.get():
