@@ -7,6 +7,7 @@ from AIplayed import Game
 from plothelper import plot
 from Gameproperties import Properties
 import pygame
+import math
 
 MAX_MEMORY = 1000_000
 BATCH_SIZE = 1000
@@ -16,14 +17,14 @@ class Agent:
 
     def __init__(self):
         Properties.n_games = 0
-        self.epsilon = 2000 # randomness
+        self.epsilon = 300 # randomness
         self.gamma = 0.98 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
         self.model = Linear_QNet(1, 2, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def metoda(self, PT1 , Blocks0 ):
-
+        return PT1.pos.x - Blocks0.pos.x
         if (PT1.pos.x - Blocks0.pos.x) == 0:
             return 0
         if (PT1.pos.y - Blocks0.pos.y) == 0:
@@ -62,7 +63,8 @@ class Agent:
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             final_move = torch.argmax(prediction).item()
-        self.epsilon = 80 * 0.99 ** Properties.n_games
+        self.epsilon = self.epsilon * 0.9999
+        print("Epsilon: ", self.epsilon)
         return final_move
 
     def train(self):

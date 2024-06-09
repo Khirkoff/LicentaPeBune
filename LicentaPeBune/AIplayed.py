@@ -40,6 +40,7 @@ class Game:
     def update(self):
         hits = pygame.sprite.spritecollide(self.PT1, self.blocksgroup, True)
         if hits:
+            Properties.reward = 0
             Properties.score += 1
             self.createblock()
             return 1
@@ -47,6 +48,7 @@ class Game:
             for block in self.blocksgroup:
                 if block.rect.y > self.PT1.rect.y:
                     Properties.running = False
+                    Properties.reward = 0
                     return 2
                     # self.reset()
                 else:
@@ -65,7 +67,7 @@ class Game:
         self.FramesPerSec.tick(Properties.FPS)
 
     def play_step(self, action):
-        Properties.reward=0
+#         Properties.reward=0
         # oldPosition_x = self.PT1.pos.x
         oldPosition_x = self.metoda(self.PT1, self.Blocks0)
         if action == 0:
@@ -81,27 +83,41 @@ class Game:
 
         self.actions(oldPosition_x , new_position_x)
         self.update()
-        # if self.update()==1:
-        #     Properties.reward = 10
-        # elif self.update()==2:
-        #     Properties.reward -= 2
+        print(f"bloc: (x: {self.Blocks0.pos.x}; y: {self.Blocks0.pos.y})")
+        print(f"bogdan: (x: {self.PT1.pos.x}; y: {self.PT1.pos.y})")
+        print(f"reward: {Properties.reward}; ")
+        print(f"old pos: {oldPosition_x}; new pos: {new_position_x}")
+
 
         return Properties.reward, Properties.running, Properties.score
 
-    # def actions(self,oldPositionX):
-    #     if abs(self.PT1.pos.x - self.Blocks0.pos.x) < abs(self.Blocks0.pos.x - oldPositionX):
-    #         Properties.reward = 0.05
-    #     else:
-    #         Properties.reward = -0.1
-
     def actions(self, oldPositionX, newPositionX):
-        if abs(newPositionX) < abs(oldPositionX):
-            Properties.reward = 1
-        else:
-            Properties.reward = -1
+#         Properties.reward = 0
+        if newPositionX - oldPositionX == 0 and newPositionX == 0:
+            if Properties.reward < 0:
+                Properties.reward = 0
+            Properties.reward += 0.1
+            return
+
+        if newPositionX == oldPositionX:
+            if Properties.reward > 0:
+                Properties.reward = 0
+            Properties.reward += -0.09
+            return
+
+        if abs(newPositionX) >= abs(oldPositionX):
+            if Properties.reward > 0:
+                Properties.reward = 0
+            Properties.reward += -0.09
+            return
+
+        if Properties.reward < 0:
+            Properties.reward = 0
+        Properties.reward += 0.1
 
 
     def metoda(self, PT1 , Blocks0 ):
+        return PT1.pos.x - Blocks0.pos.x
         if (PT1.pos.x - Blocks0.pos.x) == 0:
             return 0
         if (PT1.pos.y - Blocks0.pos.y) == 0:

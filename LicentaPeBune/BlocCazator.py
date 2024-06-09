@@ -9,7 +9,7 @@ class Block(pygame.sprite.Sprite):
         super().__init__()
         self.surf = pygame.image.load("img/Licenta.png")
         self.rect = self.surf.get_rect(center=(-100, -100))
-        wrandom = random.randint(50, int(Properties.latime - 50))
+        wrandom = random.randint(150, int(Properties.latime - 150))
         self.pos = Properties.vec((wrandom, 0))
 
 
