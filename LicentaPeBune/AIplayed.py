@@ -1,5 +1,5 @@
 import pygame
-from pygame.locals import *
+
 
 from Gameproperties import Properties
 from BlocCazator import Block
@@ -45,8 +45,6 @@ class Game:
         hits = pygame.sprite.spritecollide(self.PT1, self.blocksgroup, True)
         if hits:
             Properties.score += 1
-            # Properties.speed += 0.1
-            # Properties.Vel += 0.1
             self.createblock()
             return 1
         else:
@@ -80,8 +78,7 @@ class Game:
             self.PT1.move_right()
             self.actions(oldPosition_x)
         elif action == 2:
-            if self.PT1.pos.x - self.Blocks0.pos.x == 0:
-                self.PT1.stay_in_place()
+            self.PT1.stay_in_place()
         self.render()
         if self.update()==1:
             Properties.reward = 10

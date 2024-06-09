@@ -7,6 +7,7 @@ from AIplayed import Game
 from plothelper import plot
 from Gameproperties import Properties
 import pygame
+import math
 
 MAX_MEMORY = 1000_000
 BATCH_SIZE = 1000
@@ -16,16 +17,19 @@ class Agent:
 
     def __init__(self):
         Properties.n_games = 0
-        self.epsilon = 100 # randomness
+        self.epsilon = 200 # randomness
         self.gamma = 0.97 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) # popleft()
-        self.model = Linear_QNet(2, 5, 3)
+        self.model = Linear_QNet(4, 10, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
+
         state = [
             game.PT1.pos.x,  # Position of the platform
-            game.Blocks0.pos.x  # Position of the falling block  # Velocity of the falling block
+            game.Blocks0.pos.x,
+            Properties.Vel,  # Position of the falling block  # Velocity of the falling block
+            Properties.speed,
         ]
         return state
 
@@ -49,13 +53,13 @@ class Agent:
         if random.randint(0, 200) < self.epsilon:
             # Explore: select a random action
             final_move = random.randint(0, 2)
-            print("1: ",final_move)
+
         else:
             # Exploit: select the action with max value (greedy)
             state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             final_move = torch.argmax(prediction).item()
-            print("2: ",final_move)
+
         return final_move
 
     def train(self):
@@ -66,6 +70,9 @@ class Agent:
         game.loadgrafic()
         game.blocksgroup.add(game.Blocks0)
         game.all_sprites.add(game.PT1)
+        game.all_sprites.add(game.Blocks0)
+
+
 
         while Properties.running:
             for event in pygame.event.get():

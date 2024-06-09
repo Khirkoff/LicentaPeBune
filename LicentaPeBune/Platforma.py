@@ -28,14 +28,14 @@ class Platform(pygame.sprite.Sprite):
 
     def move_left(self):
         self.pos.x -= Properties.Vel
-        if self.pos.x < 100:
-            self.pos.x = 100
+        if self.pos.x < 99.5:
+            self.pos.x = 99.5
         self.rect.midbottom = self.pos
 
     def move_right(self):
         self.pos.x += Properties.Vel
-        if self.pos.x > Properties.WIDTH - 100:
-            self.pos.x = Properties.WIDTH - 100
+        if self.pos.x > Properties.WIDTH - 99.5:
+            self.pos.x = Properties.WIDTH - 99.5
         self.rect.midbottom = self.pos
 
     def stay_in_place(self):
